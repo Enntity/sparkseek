@@ -1,0 +1,28 @@
+{
+  "schema": "sparkseek.checkpoints/v1",
+  "note": "Weights SparkSeek targets, pinned by revision. Capacity per Spark is from results/2026-10-26-weights (headers only; nothing served yet). Engram tables stay on each Spark's NVMe behind a row cache in every profile.",
+  "checkpoints": {
+    "deepseek-fp8-mxfp4": {
+      "repo": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+      "revision": "1bae0e1088993b9b82de08f59de5be5a34e42170",
+      "bytes": 510286023000,
+      "world": [4],
+      "role": "Strict, TP4: DeepSeek's release as published (FP8 dense in 32x32 blocks, MXFP4 routed experts). 74.2 GiB per rank.",
+      "engram_files": ["model-00047-of-00048.safetensors", "model-00048-of-00048.safetensors"]
+    },
+    "exl3-2.5bpw": {
+      "repo": "bertholomus/DeepSeek-V4.1-Flash-1017-EXL3-2.5bpw",
+      "revision": "b8054f701a629b02faf2fc5713d0b6912c1ad82b",
+      "bytes": 184465834680,
+      "world": [2, 4],
+      "role": "Lossy, TP2: the only published pack that fits two Sparks with KV room (87.1 GiB per rank). Its Engram tables come from deepseek-fp8-mxfp4's engram_files.",
+      "engram_from": "deepseek-fp8-mxfp4"
+    }
+  },
+  "considered": {
+    "nvidia/DeepSeek-V4.1-Flash-NVFP4@c48dca0146b56d64c8116dbb6fcace8b7cc835f8": "Fits TP4 (78.2 GiB per rank), but it quantizes the September V4.1-Flash, not the 1017 update, and its MXFP4 Engram tables are lossy. Its routed-expert conversion is lossless, so the same cast can be applied to 1017's experts if Atlas's NVFP4 kernels beat MXFP4 ones.",
+    "Mia-AiLab/DeepSeek-V4.1-Flash-1017-EXL3-EAQ-v1-2.9-bpw@45ee5d0fd106c94a3d77f721e09cbb2f50e5a16b": "99.3 GiB per rank at TP2: no KV room at utilization 0.88; 4.1M positions at 0.90 and 8.4M at 0.93. A TP4 option.",
+    "bertholomus/DeepSeek-V4.1-Flash-1017-EXL3-4.0bpw@f3657818ca522b38aad5449b16aa1991c96a3e83": "TP4 only (69.3 GiB per rank); closer to the release than 2.5 bpw (author's KL 0.033 vs 0.13).",
+    "ISTA-DASLab/DeepSeek-V4.1-Flash-1017-GSQ-RCO-GGUF@653a9874aa38c356233c5f3cc8c96b19a43b57eb": "IQ2_XXS / IQ2_XS backbones of 138 / 155 GB would fit TP2 with room, but Atlas has no IQ2 GPU kernels and no engine yet reads DeepSeek-V4.1 GGUF names except Strata."
+  }
+}

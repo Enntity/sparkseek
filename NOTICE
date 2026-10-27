@@ -1,0 +1,15 @@
+SparkSeek
+Copyright 2026 the SparkSeek contributors
+Licensed under AGPL-3.0-only (LICENSE).
+
+The Atlas engine is built from Enntity/atlas at the commit in
+install/atlas-source.json (AGPL-3.0-only): Atlas-Inf plus SparkSeek's
+DeepSeek-V4.1-Flash work.
+
+tools/memory_plan.py and the Atlas Engram hash follow DeepSeek's reference
+implementation of DeepSeek-V4.1-Flash (inference/model.py, inference/engram.py;
+MIT, Copyright (c) 2026 DeepSeek), written independently against it.
+
+The model weights are not distributed here. DeepSeek-V4.1-Flash-1017 is
+MIT-licensed by DeepSeek; the community quantizations named in
+install/checkpoints.json carry their authors' terms.

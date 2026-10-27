@@ -1,0 +1,14 @@
+{
+  "schema": "sparkseek.atlas-engine-source/v2",
+  "note": "Not yet buildable: the series has CPU-side groundwork only and is not published. The commit and tree are filled in when the branch is pushed; build tooling will refuse any other tree, as SparkGLM's and SparkQwen's do.",
+  "repository": "https://github.com/Enntity/atlas.git",
+  "branch": "upstream/deepseek-v41-flash-20261026",
+  "commit": null,
+  "tree": null,
+  "layers": {
+    "atlas_inf_main_base": "504063ad4ed1fe7a5ea89e324a0eda66db925134"
+  },
+  "kernel_target": "deepseek-v4.1-flash",
+  "model_type": "deepseek_v41",
+  "license": "AGPL-3.0-only"
+}

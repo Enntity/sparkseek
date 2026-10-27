@@ -1,0 +1,13 @@
+.env
+__pycache__/
+*.py[cod]
+.venv/
+
+# Never commit weights, compiled GPU artifacts or credentials.
+*.safetensors
+*.gguf
+*.bin
+*.so
+*.key
+*.pem
+.claude/
