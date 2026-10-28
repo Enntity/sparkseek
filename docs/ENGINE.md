@@ -12,7 +12,7 @@ GPU code has been written or run.
 `upstream/deepseek-v41-flash-20261026` in Enntity/atlas, cut from Atlas-Inf
 `main` at `504063ad`, so the series stays proposable upstream. The product
 build will stack it on the shared engine layer SparkGLM and SparkQwen use
-(`upstream/atlas-shared-*`) once there is something to serve. Not pushed yet.
+(`upstream/atlas-shared-*`) once there is something to serve. Pinned in `install/atlas-source.json`.
 
 ## What V4.1 changes from V4
 
