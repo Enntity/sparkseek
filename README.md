@@ -17,7 +17,8 @@ the drafter come next, on Sparks ([docs/ENGINE.md](docs/ENGINE.md),
 ## What fits
 
 From the safetensors headers of each pinned revision
-([results/2026-10-26-weights](results/2026-10-26-weights/RESULT.md)), at
+([results/2026-10-26-weights](results/2026-10-26-weights/RESULT.md),
+[results/2026-10-30-nvfp4-1017](results/2026-10-30-nvfp4-1017/RESULT.md)), at
 SparkGLM's memory setting (99.3 GiB per Spark for weights and KV):
 
 | Sparks | Weights | Per rank | Status |
@@ -26,12 +27,13 @@ SparkGLM's memory setting (99.3 GiB per Spark for weights and KV):
 | **2** | [EXL3 2.5 bpw](https://huggingface.co/bertholomus/DeepSeek-V4.1-Flash-1017-EXL3-2.5bpw) by bertholomus, lossy | 87.1 GiB | the only published pack with KV room at TP2 |
 | 2 | DeepSeek's release | 145.0 GiB | does not fit |
 | 2 | EXL3 2.9 bpw (Mia-AiLab EAQ) | 99.3 GiB | no KV room at 0.88; 4-8M positions at 0.90-0.93 |
-| 4 | NVIDIA NVFP4 | 78.2 GiB | fits, but quantizes the older September model |
+| 4 | [NVIDIA NVFP4 of 1017](https://huggingface.co/nvidia/DeepSeek-V4.1-Flash-1017-NVFP4), lossy Engram tables | 78.2 GiB | candidate, to test against the release on Sparks |
 
-In every case the two Engram tables (203 GB) stay on each Spark's NVMe behind
-a row cache, as TensorFold serves them; held in memory they push four Sparks
-to 121.5 GiB a rank. KV is not the constraint: 890 bytes a token, so a
-1M-token request needs about 0.9 GB.
+In every case the two Engram tables stay on each Spark's NVMe behind a row
+cache, as TensorFold serves them. They are 203 GB in DeepSeek's release and
+104 GB in NVIDIA's pack; held in memory they push four Sparks to 121.5 and
+102.5 GiB a rank. KV is not the constraint: 890 bytes a token, so a 1M-token
+request needs about 0.9 GB.
 
 `tools/memory_plan.py` recomputes any row from a checkpoint's headers:
 
@@ -56,7 +58,8 @@ branch `upstream/deepseek-v41-flash-20261026`
 DeepSeek-V4.1-Flash and its reference implementation are DeepSeek's (MIT).
 Capacity figures for other engines and the TP2 pack's quality are their
 authors': MiaAI-Lab's TensorFold recipe for four Sparks, bertholomus's EXL3
-packs and two-Spark TensorFold recipe, Mia-AiLab's EAQ packs.
+packs and two-Spark TensorFold recipe, Mia-AiLab's EAQ packs, NVIDIA's NVFP4
+pack and its accuracy results.
 
 ## License
 

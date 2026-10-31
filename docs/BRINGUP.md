@@ -12,6 +12,8 @@ production without its owner's go-ahead.
   every Spark's own NVMe; TensorFold reads the rest over NFS from one Spark.
   Plan for the full checkpoint on one Spark and the Engram shards on each.
 - The TP2 pack is 185 GB on each Spark, plus the same two Engram shards.
+- NVIDIA's NVFP4 pack, if testing it, is 429 GB. Its own Engram shards (the same
+  two file names, 52 GB each) go on every Spark's NVMe.
 - O_DIRECT reads need ext4 or xfs. Check the NVMe's random 4 KiB read rate
   (`fio --rw=randread --bs=4k --direct=1 --iodepth=64`); the Engram row cache
   misses go there.
@@ -42,6 +44,7 @@ same prompt, compare ids.
 | 10 TP | TP2/TP4 logits against TP1 on a 4-layer slice; then the full model on four Sparks: 9/9 RigMark gates, needle at 128K and 1M |
 | 11 DSpark | greedy output identical with drafting on and off, at 1, 4 and 8 streams; acceptance per step |
 | 12 EXL3 TP2 | KL and top-1 against the release on the same rows bertholomus published |
+| NVFP4 lane | after step 11: KL and top-1 against the release, decode speed and Engram hit rate, with the drafter on; W4A16 and W4A4 experts both measured |
 
 ## Baselines on the same Sparks
 

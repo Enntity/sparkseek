@@ -98,9 +98,9 @@ needs one.
    `encoding/tests` pairs byte for byte, and the tool parser on the new tag
    names.
 5. **Weight manifest and preflight.** Expected names, dtypes and shapes for the
-   release and the EXL3 2.5 bpw pack, checked against the headers; the 32x32
-   FP8 scale shapes; DSpark stage tensors. Accept: the manifest matches both
-   checkpoints' headers with no extras.
+   release, NVIDIA's NVFP4 pack and the EXL3 2.5 bpw pack, checked against the
+   headers; the 32x32 FP8 scale shapes; DSpark stage tensors. Accept: the
+   manifest matches all three checkpoints' headers with no extras.
 6. **Kernel target.** `kernels/gb10/deepseek-v4.1-flash/` (`model_type
    deepseek_v41`, `hidden_size 5120`) layering V4's MoE and mHC kernels, plus a
    32-wide-block FP8 GEMV. Spark: `--check-kernels` resolves every handle.
@@ -128,3 +128,26 @@ needs one.
 13. **Vision.** ViT, aligner, VL routing bias.
 
 The Strict TP4 lane (steps 3-11, 13) does not depend on step 12.
+
+## NVIDIA's NVFP4 pack: an optional TP4 lane
+
+`nvidia/DeepSeek-V4.1-Flash-1017-NVFP4` is the same 1017 revision with NVFP4
+routed experts and lossy MXFP4 Engram tables
+([results/2026-10-30-nvfp4-1017](../results/2026-10-30-nvfp4-1017/RESULT.md)).
+It costs 4.0 GiB more per rank than the release, and its Engram tables are half
+the size, so the same cache holds about twice the rows. The lossy tables keep it
+out of the Strict lane: it stays off by default and is adopted only if it wins.
+
+Beyond the Strict steps it needs:
+
+- **Experts.** Load `weight_scale`, `weight_scale_2` and `input_scale` for the
+  main model while DSpark experts keep MXFP4 and `scale`. Atlas has both V4's
+  NVFP4 W4A16 kernels and a W4A4 grouped kernel
+  (`nemotron-labs-3-puzzle-75b-a9b/nvfp4/moe_w4a4_grouped.cu`). NVIDIA calibrated
+  and evaluated W4A4, so that is the mode its figures describe. Compare both
+  against the release's logits before choosing.
+- **Engram.** Step 9 over MXFP4 rows: 136 bytes each, 256 FP4 values with an
+  E8M0 scale per 32.
+
+Accept: on the same Sparks, KL and top-1 against the release, decode speed, and
+Engram cache hit rate, with the drafter on. NVIDIA did not exercise it.
