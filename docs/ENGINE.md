@@ -143,6 +143,21 @@ one.
    partial-group state per sequence; correct across chunked prefill, verify
    and batching. Spark: one-layer numerics against the reference forward on
    recorded activations.
+
+   The reference side is recorded
+   ([results/2026-11-15-reference-layers](../results/2026-11-15-reference-layers/RESULT.md)):
+   layers 0 to 2 of DeepSeek's code on the release's weights, 1,401 tokens
+   prefilled and 48 decoded. What it fixes for this step:
+   - The window ring and the compressed KV reproduce bit for bit from a short
+     recipe, so the engine's caches are compared for equality.
+   - Attention output is accepted within about 1.3e-3 relative of the
+     reference on the reference's own inputs. Tighter needs the reference's
+     BF16 weight rounding and 64-key schedule.
+   - The reference has no chunked prefill, and its own decode and prefill
+     paths are 5% apart by layer 2. Chunked prefill is checked against a
+     single prefill, and no check compares whole-model logits tightly.
+   - The reference's 64-head attention kernel does not fit a GB10's shared
+     memory; it ran 16 heads at a time.
 8. **Indexer and candidate blocks.** Sources compute scores (TP-split heads,
    summed across ranks), consumers reuse top-k; layer 20 picks candidate
    blocks. Spark: top-k agreement with the reference past 32K tokens.
