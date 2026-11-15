@@ -37,6 +37,7 @@ p.add_argument("--layers", type=int, default=3)
 p.add_argument("--prefill", type=int, default=1401)
 p.add_argument("--decode", type=int, default=48)
 p.add_argument("--no-engram", action="store_true")
+p.add_argument("--ops", action="store_true", help="also save every projection, norm, gate and Hyper-Connection step of run A")
 p.add_argument("--text", nargs="+", required=True, help="text files that supply the tokens")
 a = p.parse_args()
 
@@ -91,6 +92,11 @@ def gather_rows(path, name, rows):
     return dtype, torch.from_numpy(np.ascontiguousarray(table[rows]))
 
 
+# NVIDIA's PyTorch containers run FP32 matrix products in TF32 unless told not to; stock PyTorch,
+# which the reference is written for, does not. TF32 puts about 3e-4 of error into the reference's
+# FP32 products (Hyper-Connection mixes, routing scores, the compressor).
+torch.backends.cuda.matmul.allow_tf32 = False
+torch.backends.cudnn.allow_tf32 = False
 torch.set_default_dtype(torch.bfloat16)
 torch.manual_seed(0)
 torch.cuda.set_device(0)
@@ -174,6 +180,52 @@ for i, layer in enumerate(net.layers):
         layer.attn.compressor.register_forward_hook(lambda m, x, y, L=L: keep(L + "compressor_latent", y))
     if layer.attn.indexer is not None:
         layer.attn.indexer.register_forward_hook(lambda m, x, y, L=L: keep(L + "indexer_topk", y))
+
+
+# Hyper-Connection sites in the order a block reaches them; "final" is the collapse before the head.
+SITES = ("attn", "ffn", "final")
+
+
+def record_ops():
+    """Inputs and outputs of each operation inside a block, for run A. Routed experts are left out:
+    there are 384 a layer, and the MoE's own input, routing and output are saved."""
+    for i, layer in enumerate(net.layers):
+        L = f"L{i}.op."
+        for path, module in layer.named_modules():
+            if ".experts." in path or not path:
+                continue
+            if isinstance(module, (M.Linear, M.RMSNorm, SparseEngramEmbedding, M.MoE)):
+                module.register_forward_pre_hook(lambda m, x, n=L + path: keep(n + ".in", x[0]))
+                module.register_forward_hook(lambda m, x, y, n=L + path: keep(n + ".out", y))
+            elif isinstance(module, M.Gate):
+                module.register_forward_hook(
+                    lambda m, x, y, n=L + path: (keep(n + ".weights", y[0]), keep(n + ".indices", y[1])) and None
+                )
+        site = {"n": 0}
+        layer.register_forward_pre_hook(lambda m, x, site=site: site.update(n=0))
+
+        def mixes(*args, layer=layer, L=L, site=site, inner=layer.hc_mixes):
+            pre, post, comb = inner(*args)
+            name = f"{L}hc.{SITES[site['n']]}."
+            keep(name + "pre", pre), keep(name + "post", post), keep(name + "comb", comb)
+            return pre, post, comb
+
+        def collapse(*args, L=L, site=site, inner=layer.hc_pre):
+            y = inner(*args)
+            keep(f"{L}hc.{SITES[site['n']]}.collapsed", y)
+            return y
+
+        def expand(*args, L=L, site=site, inner=layer.hc_post):
+            y = inner(*args)
+            keep(f"{L}hc.{SITES[site['n']]}.expanded", y)
+            site["n"] += 1
+            return y
+
+        layer.hc_mixes, layer.hc_pre, layer.hc_post = mixes, collapse, expand
+
+
+if a.ops:
+    record_ops()
 
 reference_sparse_attn = M.sparse_attn
 operands = {"on": True}
@@ -280,6 +332,8 @@ with torch.inference_mode():
     operands["on"] = False
     reset()
     net(ids, 0)
+    for name in [n for n in rec if ".op." in n]:
+        del rec[name]
     full, full_cache = flush(), caches("after_prefill", total)
 
 # The reference against itself: positions decoded one at a time in A, prefilled in B.
@@ -313,8 +367,10 @@ meta = {
     "text_files": [os.path.basename(f) for f in a.text],
     "run_a_repeats_bit_for_bit": same,
     "reference_decode_vs_prefill": spread,
+    "ops": a.ops,
     "left_unloaded": sorted(missing),
     "sparse_attn_heads_per_call": HEADS_PER_CALL,
+    "tf32_matmul": torch.backends.cuda.matmul.allow_tf32,
     "torch": torch.__version__,
     "gpu": torch.cuda.get_device_name(0),
     "tensors": shapes,

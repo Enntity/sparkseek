@@ -16,7 +16,7 @@ indexer, so the three cover every kind of cache the step builds.
 # nvcr.io/nvidia/pytorch:25.10-py3, tilelang==0.1.12, safetensors, tokenizers, sympy, tqdm
 python $REF/convert.py --hf-ckpt-path <model-00002..00005 only> --save-path slice \
     --model-parallel 1 --expert-dtype fp4 --tokenizer-path $CKPT
-python record.py --ref $REF --slice slice/model0-mp1.safetensors --ckpt $CKPT --out rec \
+python record.py --ops --ref $REF --slice slice/model0-mp1.safetensors --ckpt $CKPT --out rec \
     --prefill 1401 --decode 48 --text $REF/README.md $REF/model.py
 python check.py --rec rec --slice slice/model0-mp1.safetensors --config $REF/config.json
 ```
@@ -40,6 +40,15 @@ positions to choose from.
   four times. Everything else in `kernel.py` runs unchanged on a GB10, and
   `python model.py`, the reference's self-test, passes there.
 - **PyTorch 2.9**, from the NVIDIA container; `requirements.txt` asks for 2.10.
+- **TF32 off.** NVIDIA's container runs FP32 matrix products in TF32 unless
+  told not to; stock PyTorch, which the reference is written for, does not.
+  `record.py` turns it off. With it on, the reference's FP32 products
+  (Hyper-Connection mixes, routing scores, the compressor's projections) are
+  about 3e-4 from their exact values.
+
+The first version of this result, published earlier the same day, was recorded
+with TF32 on. Its tensors are replaced by the ones described here. The
+findings did not change; the figures in the first table did.
 
 ## The reference against itself
 
@@ -47,9 +56,9 @@ positions to choose from.
 |---|---|
 | Run A repeated in the same process | every saved tensor bit-identical |
 | Layer 0, positions 1,401 to 1,448: decoded (A) against prefilled (B), same inputs | attention output differs by 2.2e-4 relative; window ring bit-identical |
-| Same positions, layer 0 block output | 1.9e-3 |
-| Layer 1 attention input / output | 3.3e-3 / 2.8e-2 |
-| Layer 2 attention input / output | 2.1e-2 / 5.0e-2 |
+| Same positions, layer 0 block output | 5.9e-4 |
+| Layer 1 attention input / output | 1.3e-3 / 1.7e-2 |
+| Layer 2 attention input / output | 1.9e-2 / 5.3e-2 |
 
 Differences are relative L2 ([stages.json](stages.json)). The first comes from
 the order keys are read in: a decode step reads the ring, prefill reads
@@ -67,8 +76,8 @@ the saved tensors ([check.json](check.json)):
 | Window ring: slot `pos % 128` holds position `pos`'s key; a decode step rewrites one slot; decode reads slots oldest first | 0, 1, 2 | exact, after prefill and after every decode step |
 | Compressed KV: the compressor's latent, rotated at its group's first position (theta 160,000, YaRN), quantized to FP4 in groups of 16 under an E4M3 scale | 2 | all 700 prefill groups and 24 decode groups bit-identical |
 | A group completes at decode when `pos + 1` divides by the ratio; the one prefill left half full completes on the first decode step | 2 | holds |
-| Attention output, following the kernel's schedule: 64 keys at a time in index order, running maximum, weights rounded to BF16 before they multiply the keys | 0, 1, 2 | 99.87% to 99.99% of output bits equal; 2e-5 to 9e-5 relative |
-| Attention output, plain softmax in float64 | 0, 1, 2 | 81% to 86% of output bits equal; 1.1e-3 to 1.3e-3 relative |
+| Attention output, following the kernel's schedule: 64 keys at a time in index order, running maximum, weights rounded to BF16 before they multiply the keys | 0, 1, 2 | 99.88% to 99.99% of output bits equal; 2e-5 to 9e-5 relative |
+| Attention output, plain softmax in float64 | 0, 1, 2 | 81% to 86% of output bits equal; 1.0e-3 to 1.3e-3 relative |
 
 ## What it means for the engine
 
@@ -98,6 +107,10 @@ the saved tensors ([check.json](check.json)):
 ## Files
 
 `record.py` and `check.py` are the two scripts. `meta.json` has the token ids
-and the shape of every saved tensor. The tensors are 1.7 GB and are not in the
-repository; `tensors.sha256` lists their hashes from this run, and `record.py`
-rebuilds them from the public release.
+and the shape of every saved tensor. With `--ops`, run A also saves the input
+and output of every projection, norm and Hyper-Connection step inside a block,
+and each MoE's input, routing and output (`L<layer>.op.<module>.in`, `.out`),
+so one operation can be checked from its own recorded input. The tensors are
+3.3 GB and are not in the repository; `tensors.sha256` lists their hashes from
+this run, and `record.py` rebuilds them from the public release. A second run
+in a new process gave the same hashes.
