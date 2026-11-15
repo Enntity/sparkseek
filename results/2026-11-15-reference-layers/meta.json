@@ -1469,14 +1469,14 @@
    }
   },
   "L1": {
-   "attn_out_rel_l2_decode_vs_prefill": 0.02820803038775921,
+   "attn_out_rel_l2_decode_vs_prefill": 0.017089566215872765,
    "attn_in_bit_equal": false,
    "caches_bit_equal_decode_vs_prefill": {
     "window_kv_cache": false
    }
   },
   "L2": {
-   "attn_out_rel_l2_decode_vs_prefill": 0.050373394042253494,
+   "attn_out_rel_l2_decode_vs_prefill": 0.05277764052152634,
    "attn_in_bit_equal": false,
    "caches_bit_equal_decode_vs_prefill": {
     "window_kv_cache": false,
@@ -1487,11 +1487,13 @@
    }
   }
  },
+ "ops": true,
  "left_unloaded": [
   "head.weight",
   "norm.weight"
  ],
  "sparse_attn_heads_per_call": 16,
+ "tf32_matmul": false,
  "torch": "2.9.0a0+145a3a7bda.nv25.10",
  "gpu": "NVIDIA GB10",
  "tensors": {
@@ -1513,12 +1515,141 @@
      4
     ]
    ],
+   "L0.op.hc.attn.pre": [
+    "float32",
+    [
+     1,
+     1401,
+     4
+    ]
+   ],
+   "L0.op.hc.attn.post": [
+    "float32",
+    [
+     1,
+     1401,
+     4
+    ]
+   ],
+   "L0.op.hc.attn.comb": [
+    "float32",
+    [
+     1,
+     1401,
+     4,
+     4
+    ]
+   ],
+   "L0.op.hc.attn.collapsed": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L0.op.attn_norm.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L0.op.attn_norm.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
    "L0.attn_in": [
     "bfloat16",
     [
      1,
      1401,
      5120
+    ]
+   ],
+   "L0.op.attn.wq_a.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L0.op.attn.wq_a.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     1280
+    ]
+   ],
+   "L0.op.attn.q_norm.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     1280
+    ]
+   ],
+   "L0.op.attn.q_norm.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     1280
+    ]
+   ],
+   "L0.op.attn.wq_b.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     1280
+    ]
+   ],
+   "L0.op.attn.wq_b.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     32768
+    ]
+   ],
+   "L0.op.attn.wkv.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L0.op.attn.wkv.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     512
+    ]
+   ],
+   "L0.op.attn.kv_norm.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     512
+    ]
+   ],
+   "L0.op.attn.kv_norm.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     512
     ]
    ],
    "L0.sa_idxs": [
@@ -1555,11 +1686,166 @@
      512
     ]
    ],
+   "L0.op.attn.wo_b.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     8192
+    ]
+   ],
+   "L0.op.attn.wo_b.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
    "L0.attn_out": [
     "bfloat16",
     [
      1,
      1401,
+     5120
+    ]
+   ],
+   "L0.op.hc.attn.expanded": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     4,
+     5120
+    ]
+   ],
+   "L0.op.hc.ffn.pre": [
+    "float32",
+    [
+     1,
+     1401,
+     4
+    ]
+   ],
+   "L0.op.hc.ffn.post": [
+    "float32",
+    [
+     1,
+     1401,
+     4
+    ]
+   ],
+   "L0.op.hc.ffn.comb": [
+    "float32",
+    [
+     1,
+     1401,
+     4,
+     4
+    ]
+   ],
+   "L0.op.hc.ffn.collapsed": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L0.op.ffn_norm.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L0.op.ffn_norm.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L0.op.ffn.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L0.op.ffn.gate.weights": [
+    "float32",
+    [
+     1401,
+     6
+    ]
+   ],
+   "L0.op.ffn.gate.indices": [
+    "int64",
+    [
+     1401,
+     6
+    ]
+   ],
+   "L0.op.ffn.shared_experts.w1.in": [
+    "bfloat16",
+    [
+     1401,
+     5120
+    ]
+   ],
+   "L0.op.ffn.shared_experts.w1.out": [
+    "bfloat16",
+    [
+     1401,
+     2304
+    ]
+   ],
+   "L0.op.ffn.shared_experts.w3.in": [
+    "bfloat16",
+    [
+     1401,
+     5120
+    ]
+   ],
+   "L0.op.ffn.shared_experts.w3.out": [
+    "bfloat16",
+    [
+     1401,
+     2304
+    ]
+   ],
+   "L0.op.ffn.shared_experts.w2.in": [
+    "bfloat16",
+    [
+     1401,
+     2304
+    ]
+   ],
+   "L0.op.ffn.shared_experts.w2.out": [
+    "bfloat16",
+    [
+     1401,
+     5120
+    ]
+   ],
+   "L0.op.ffn.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L0.op.hc.ffn.expanded": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     4,
      5120
     ]
    ],
@@ -1597,6 +1883,39 @@
      24
     ]
    ],
+   "L1.op.engram.embed.in": [
+    "int64",
+    [
+     1,
+     1401,
+     24
+    ]
+   ],
+   "L1.op.engram.embed.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     24,
+     256
+    ]
+   ],
+   "L1.op.engram.wkv.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     6144
+    ]
+   ],
+   "L1.op.engram.wkv.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     25600
+    ]
+   ],
    "L1.engram_out": [
     "bfloat16",
     [
@@ -1623,12 +1942,141 @@
      4
     ]
    ],
+   "L1.op.hc.attn.pre": [
+    "float32",
+    [
+     1,
+     1401,
+     4
+    ]
+   ],
+   "L1.op.hc.attn.post": [
+    "float32",
+    [
+     1,
+     1401,
+     4
+    ]
+   ],
+   "L1.op.hc.attn.comb": [
+    "float32",
+    [
+     1,
+     1401,
+     4,
+     4
+    ]
+   ],
+   "L1.op.hc.attn.collapsed": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L1.op.attn_norm.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L1.op.attn_norm.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
    "L1.attn_in": [
     "bfloat16",
     [
      1,
      1401,
      5120
+    ]
+   ],
+   "L1.op.attn.wq_a.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L1.op.attn.wq_a.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     1280
+    ]
+   ],
+   "L1.op.attn.q_norm.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     1280
+    ]
+   ],
+   "L1.op.attn.q_norm.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     1280
+    ]
+   ],
+   "L1.op.attn.wq_b.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     1280
+    ]
+   ],
+   "L1.op.attn.wq_b.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     32768
+    ]
+   ],
+   "L1.op.attn.wkv.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L1.op.attn.wkv.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     512
+    ]
+   ],
+   "L1.op.attn.kv_norm.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     512
+    ]
+   ],
+   "L1.op.attn.kv_norm.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     512
     ]
    ],
    "L1.sa_idxs": [
@@ -1665,11 +2113,166 @@
      512
     ]
    ],
+   "L1.op.attn.wo_b.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     8192
+    ]
+   ],
+   "L1.op.attn.wo_b.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
    "L1.attn_out": [
     "bfloat16",
     [
      1,
      1401,
+     5120
+    ]
+   ],
+   "L1.op.hc.attn.expanded": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     4,
+     5120
+    ]
+   ],
+   "L1.op.hc.ffn.pre": [
+    "float32",
+    [
+     1,
+     1401,
+     4
+    ]
+   ],
+   "L1.op.hc.ffn.post": [
+    "float32",
+    [
+     1,
+     1401,
+     4
+    ]
+   ],
+   "L1.op.hc.ffn.comb": [
+    "float32",
+    [
+     1,
+     1401,
+     4,
+     4
+    ]
+   ],
+   "L1.op.hc.ffn.collapsed": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L1.op.ffn_norm.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L1.op.ffn_norm.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L1.op.ffn.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L1.op.ffn.gate.weights": [
+    "float32",
+    [
+     1401,
+     6
+    ]
+   ],
+   "L1.op.ffn.gate.indices": [
+    "int64",
+    [
+     1401,
+     6
+    ]
+   ],
+   "L1.op.ffn.shared_experts.w1.in": [
+    "bfloat16",
+    [
+     1401,
+     5120
+    ]
+   ],
+   "L1.op.ffn.shared_experts.w1.out": [
+    "bfloat16",
+    [
+     1401,
+     2304
+    ]
+   ],
+   "L1.op.ffn.shared_experts.w3.in": [
+    "bfloat16",
+    [
+     1401,
+     5120
+    ]
+   ],
+   "L1.op.ffn.shared_experts.w3.out": [
+    "bfloat16",
+    [
+     1401,
+     2304
+    ]
+   ],
+   "L1.op.ffn.shared_experts.w2.in": [
+    "bfloat16",
+    [
+     1401,
+     2304
+    ]
+   ],
+   "L1.op.ffn.shared_experts.w2.out": [
+    "bfloat16",
+    [
+     1401,
+     5120
+    ]
+   ],
+   "L1.op.ffn.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L1.op.hc.ffn.expanded": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     4,
      5120
     ]
    ],
@@ -1707,6 +2310,55 @@
      4
     ]
    ],
+   "L2.op.hc.attn.pre": [
+    "float32",
+    [
+     1,
+     1401,
+     4
+    ]
+   ],
+   "L2.op.hc.attn.post": [
+    "float32",
+    [
+     1,
+     1401,
+     4
+    ]
+   ],
+   "L2.op.hc.attn.comb": [
+    "float32",
+    [
+     1,
+     1401,
+     4,
+     4
+    ]
+   ],
+   "L2.op.hc.attn.collapsed": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L2.op.attn_norm.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L2.op.attn_norm.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
    "L2.attn_in": [
     "bfloat16",
     [
@@ -1715,12 +2367,204 @@
      5120
     ]
    ],
+   "L2.op.attn.wq_a.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L2.op.attn.wq_a.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     1280
+    ]
+   ],
+   "L2.op.attn.q_norm.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     1280
+    ]
+   ],
+   "L2.op.attn.q_norm.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     1280
+    ]
+   ],
+   "L2.op.attn.wq_b.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     1280
+    ]
+   ],
+   "L2.op.attn.wq_b.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     32768
+    ]
+   ],
+   "L2.op.attn.wkv.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L2.op.attn.wkv.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     512
+    ]
+   ],
+   "L2.op.attn.kv_norm.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     512
+    ]
+   ],
+   "L2.op.attn.kv_norm.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     512
+    ]
+   ],
+   "L2.op.attn.compressor.wkv.in": [
+    "float32",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L2.op.attn.compressor.wkv.out": [
+    "float32",
+    [
+     1,
+     1401,
+     512
+    ]
+   ],
+   "L2.op.attn.compressor.wgate.in": [
+    "float32",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L2.op.attn.compressor.wgate.out": [
+    "float32",
+    [
+     1,
+     1401,
+     512
+    ]
+   ],
+   "L2.op.attn.compressor.norm.in": [
+    "bfloat16",
+    [
+     1,
+     700,
+     512
+    ]
+   ],
+   "L2.op.attn.compressor.norm.out": [
+    "bfloat16",
+    [
+     1,
+     700,
+     512
+    ]
+   ],
    "L2.compressor_latent": [
     "bfloat16",
     [
      1,
      700,
      512
+    ]
+   ],
+   "L2.op.attn.indexer.wk.in": [
+    "bfloat16",
+    [
+     1,
+     700,
+     512
+    ]
+   ],
+   "L2.op.attn.indexer.wk.out": [
+    "bfloat16",
+    [
+     1,
+     700,
+     128
+    ]
+   ],
+   "L2.op.attn.indexer.k_norm.in": [
+    "bfloat16",
+    [
+     1,
+     700,
+     128
+    ]
+   ],
+   "L2.op.attn.indexer.k_norm.out": [
+    "bfloat16",
+    [
+     1,
+     700,
+     128
+    ]
+   ],
+   "L2.op.attn.indexer.wq_b.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     1280
+    ]
+   ],
+   "L2.op.attn.indexer.wq_b.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     4096
+    ]
+   ],
+   "L2.op.attn.indexer.weights_proj.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L2.op.attn.indexer.weights_proj.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     32
     ]
    ],
    "L2.indexer_topk": [
@@ -1765,11 +2609,166 @@
      512
     ]
    ],
+   "L2.op.attn.wo_b.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     8192
+    ]
+   ],
+   "L2.op.attn.wo_b.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
    "L2.attn_out": [
     "bfloat16",
     [
      1,
      1401,
+     5120
+    ]
+   ],
+   "L2.op.hc.attn.expanded": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     4,
+     5120
+    ]
+   ],
+   "L2.op.hc.ffn.pre": [
+    "float32",
+    [
+     1,
+     1401,
+     4
+    ]
+   ],
+   "L2.op.hc.ffn.post": [
+    "float32",
+    [
+     1,
+     1401,
+     4
+    ]
+   ],
+   "L2.op.hc.ffn.comb": [
+    "float32",
+    [
+     1,
+     1401,
+     4,
+     4
+    ]
+   ],
+   "L2.op.hc.ffn.collapsed": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L2.op.ffn_norm.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L2.op.ffn_norm.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L2.op.ffn.in": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L2.op.ffn.gate.weights": [
+    "float32",
+    [
+     1401,
+     6
+    ]
+   ],
+   "L2.op.ffn.gate.indices": [
+    "int64",
+    [
+     1401,
+     6
+    ]
+   ],
+   "L2.op.ffn.shared_experts.w1.in": [
+    "bfloat16",
+    [
+     1401,
+     5120
+    ]
+   ],
+   "L2.op.ffn.shared_experts.w1.out": [
+    "bfloat16",
+    [
+     1401,
+     2304
+    ]
+   ],
+   "L2.op.ffn.shared_experts.w3.in": [
+    "bfloat16",
+    [
+     1401,
+     5120
+    ]
+   ],
+   "L2.op.ffn.shared_experts.w3.out": [
+    "bfloat16",
+    [
+     1401,
+     2304
+    ]
+   ],
+   "L2.op.ffn.shared_experts.w2.in": [
+    "bfloat16",
+    [
+     1401,
+     2304
+    ]
+   ],
+   "L2.op.ffn.shared_experts.w2.out": [
+    "bfloat16",
+    [
+     1401,
+     5120
+    ]
+   ],
+   "L2.op.ffn.out": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
+    ]
+   ],
+   "L2.op.hc.ffn.expanded": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     4,
      5120
     ]
    ],
@@ -1788,6 +2787,14 @@
      1,
      1401,
      4
+    ]
+   ],
+   "L2.op.hc.final.collapsed": [
+    "bfloat16",
+    [
+     1,
+     1401,
+     5120
     ]
    ]
   },
@@ -1811,6 +2818,61 @@
      4
     ]
    ],
+   "L0.op.hc.attn.pre": [
+    "float32",
+    [
+     48,
+     1,
+     1,
+     4
+    ]
+   ],
+   "L0.op.hc.attn.post": [
+    "float32",
+    [
+     48,
+     1,
+     1,
+     4
+    ]
+   ],
+   "L0.op.hc.attn.comb": [
+    "float32",
+    [
+     48,
+     1,
+     1,
+     4,
+     4
+    ]
+   ],
+   "L0.op.hc.attn.collapsed": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L0.op.attn_norm.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L0.op.attn_norm.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
    "L0.attn_in": [
     "bfloat16",
     [
@@ -1818,6 +2880,96 @@
      1,
      1,
      5120
+    ]
+   ],
+   "L0.op.attn.wq_a.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L0.op.attn.wq_a.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     1280
+    ]
+   ],
+   "L0.op.attn.q_norm.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     1280
+    ]
+   ],
+   "L0.op.attn.q_norm.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     1280
+    ]
+   ],
+   "L0.op.attn.wq_b.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     1280
+    ]
+   ],
+   "L0.op.attn.wq_b.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     32768
+    ]
+   ],
+   "L0.op.attn.wkv.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L0.op.attn.wkv.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     512
+    ]
+   ],
+   "L0.op.attn.kv_norm.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     512
+    ]
+   ],
+   "L0.op.attn.kv_norm.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     512
     ]
    ],
    "L0.sa_idxs": [
@@ -1858,12 +3010,187 @@
      512
     ]
    ],
+   "L0.op.attn.wo_b.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     8192
+    ]
+   ],
+   "L0.op.attn.wo_b.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
    "L0.attn_out": [
     "bfloat16",
     [
      48,
      1,
      1,
+     5120
+    ]
+   ],
+   "L0.op.hc.attn.expanded": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     4,
+     5120
+    ]
+   ],
+   "L0.op.hc.ffn.pre": [
+    "float32",
+    [
+     48,
+     1,
+     1,
+     4
+    ]
+   ],
+   "L0.op.hc.ffn.post": [
+    "float32",
+    [
+     48,
+     1,
+     1,
+     4
+    ]
+   ],
+   "L0.op.hc.ffn.comb": [
+    "float32",
+    [
+     48,
+     1,
+     1,
+     4,
+     4
+    ]
+   ],
+   "L0.op.hc.ffn.collapsed": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L0.op.ffn_norm.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L0.op.ffn_norm.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L0.op.ffn.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L0.op.ffn.gate.weights": [
+    "float32",
+    [
+     48,
+     1,
+     6
+    ]
+   ],
+   "L0.op.ffn.gate.indices": [
+    "int64",
+    [
+     48,
+     1,
+     6
+    ]
+   ],
+   "L0.op.ffn.shared_experts.w1.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     5120
+    ]
+   ],
+   "L0.op.ffn.shared_experts.w1.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     2304
+    ]
+   ],
+   "L0.op.ffn.shared_experts.w3.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     5120
+    ]
+   ],
+   "L0.op.ffn.shared_experts.w3.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     2304
+    ]
+   ],
+   "L0.op.ffn.shared_experts.w2.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     2304
+    ]
+   ],
+   "L0.op.ffn.shared_experts.w2.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     5120
+    ]
+   ],
+   "L0.op.ffn.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L0.op.hc.ffn.expanded": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     4,
      5120
     ]
    ],
@@ -1905,6 +3232,43 @@
      24
     ]
    ],
+   "L1.op.engram.embed.in": [
+    "int64",
+    [
+     48,
+     1,
+     1,
+     24
+    ]
+   ],
+   "L1.op.engram.embed.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     24,
+     256
+    ]
+   ],
+   "L1.op.engram.wkv.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     6144
+    ]
+   ],
+   "L1.op.engram.wkv.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     25600
+    ]
+   ],
    "L1.engram_out": [
     "bfloat16",
     [
@@ -1934,6 +3298,61 @@
      4
     ]
    ],
+   "L1.op.hc.attn.pre": [
+    "float32",
+    [
+     48,
+     1,
+     1,
+     4
+    ]
+   ],
+   "L1.op.hc.attn.post": [
+    "float32",
+    [
+     48,
+     1,
+     1,
+     4
+    ]
+   ],
+   "L1.op.hc.attn.comb": [
+    "float32",
+    [
+     48,
+     1,
+     1,
+     4,
+     4
+    ]
+   ],
+   "L1.op.hc.attn.collapsed": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L1.op.attn_norm.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L1.op.attn_norm.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
    "L1.attn_in": [
     "bfloat16",
     [
@@ -1941,6 +3360,96 @@
      1,
      1,
      5120
+    ]
+   ],
+   "L1.op.attn.wq_a.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L1.op.attn.wq_a.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     1280
+    ]
+   ],
+   "L1.op.attn.q_norm.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     1280
+    ]
+   ],
+   "L1.op.attn.q_norm.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     1280
+    ]
+   ],
+   "L1.op.attn.wq_b.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     1280
+    ]
+   ],
+   "L1.op.attn.wq_b.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     32768
+    ]
+   ],
+   "L1.op.attn.wkv.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L1.op.attn.wkv.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     512
+    ]
+   ],
+   "L1.op.attn.kv_norm.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     512
+    ]
+   ],
+   "L1.op.attn.kv_norm.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     512
     ]
    ],
    "L1.sa_idxs": [
@@ -1981,12 +3490,187 @@
      512
     ]
    ],
+   "L1.op.attn.wo_b.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     8192
+    ]
+   ],
+   "L1.op.attn.wo_b.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
    "L1.attn_out": [
     "bfloat16",
     [
      48,
      1,
      1,
+     5120
+    ]
+   ],
+   "L1.op.hc.attn.expanded": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     4,
+     5120
+    ]
+   ],
+   "L1.op.hc.ffn.pre": [
+    "float32",
+    [
+     48,
+     1,
+     1,
+     4
+    ]
+   ],
+   "L1.op.hc.ffn.post": [
+    "float32",
+    [
+     48,
+     1,
+     1,
+     4
+    ]
+   ],
+   "L1.op.hc.ffn.comb": [
+    "float32",
+    [
+     48,
+     1,
+     1,
+     4,
+     4
+    ]
+   ],
+   "L1.op.hc.ffn.collapsed": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L1.op.ffn_norm.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L1.op.ffn_norm.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L1.op.ffn.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L1.op.ffn.gate.weights": [
+    "float32",
+    [
+     48,
+     1,
+     6
+    ]
+   ],
+   "L1.op.ffn.gate.indices": [
+    "int64",
+    [
+     48,
+     1,
+     6
+    ]
+   ],
+   "L1.op.ffn.shared_experts.w1.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     5120
+    ]
+   ],
+   "L1.op.ffn.shared_experts.w1.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     2304
+    ]
+   ],
+   "L1.op.ffn.shared_experts.w3.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     5120
+    ]
+   ],
+   "L1.op.ffn.shared_experts.w3.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     2304
+    ]
+   ],
+   "L1.op.ffn.shared_experts.w2.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     2304
+    ]
+   ],
+   "L1.op.ffn.shared_experts.w2.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     5120
+    ]
+   ],
+   "L1.op.ffn.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L1.op.hc.ffn.expanded": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     4,
      5120
     ]
    ],
@@ -2028,6 +3712,61 @@
      4
     ]
    ],
+   "L2.op.hc.attn.pre": [
+    "float32",
+    [
+     48,
+     1,
+     1,
+     4
+    ]
+   ],
+   "L2.op.hc.attn.post": [
+    "float32",
+    [
+     48,
+     1,
+     1,
+     4
+    ]
+   ],
+   "L2.op.hc.attn.comb": [
+    "float32",
+    [
+     48,
+     1,
+     1,
+     4,
+     4
+    ]
+   ],
+   "L2.op.hc.attn.collapsed": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L2.op.attn_norm.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L2.op.attn_norm.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
    "L2.attn_in": [
     "bfloat16",
     [
@@ -2035,6 +3774,150 @@
      1,
      1,
      5120
+    ]
+   ],
+   "L2.op.attn.wq_a.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L2.op.attn.wq_a.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     1280
+    ]
+   ],
+   "L2.op.attn.q_norm.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     1280
+    ]
+   ],
+   "L2.op.attn.q_norm.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     1280
+    ]
+   ],
+   "L2.op.attn.wq_b.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     1280
+    ]
+   ],
+   "L2.op.attn.wq_b.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     32768
+    ]
+   ],
+   "L2.op.attn.wkv.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L2.op.attn.wkv.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     512
+    ]
+   ],
+   "L2.op.attn.kv_norm.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     512
+    ]
+   ],
+   "L2.op.attn.kv_norm.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     512
+    ]
+   ],
+   "L2.op.attn.compressor.wkv.in": [
+    "float32",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L2.op.attn.compressor.wkv.out": [
+    "float32",
+    [
+     48,
+     1,
+     1,
+     512
+    ]
+   ],
+   "L2.op.attn.compressor.wgate.in": [
+    "float32",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L2.op.attn.compressor.wgate.out": [
+    "float32",
+    [
+     48,
+     1,
+     1,
+     512
+    ]
+   ],
+   "L2.op.attn.compressor.norm.in": [
+    "bfloat16",
+    [
+     24,
+     1,
+     1,
+     512
+    ]
+   ],
+   "L2.op.attn.compressor.norm.out": [
+    "bfloat16",
+    [
+     24,
+     1,
+     1,
+     512
     ]
    ],
    "L2.compressor_latent.present": [
@@ -2050,6 +3933,78 @@
      1,
      1,
      512
+    ]
+   ],
+   "L2.op.attn.indexer.wk.in": [
+    "bfloat16",
+    [
+     24,
+     1,
+     1,
+     512
+    ]
+   ],
+   "L2.op.attn.indexer.wk.out": [
+    "bfloat16",
+    [
+     24,
+     1,
+     1,
+     128
+    ]
+   ],
+   "L2.op.attn.indexer.k_norm.in": [
+    "bfloat16",
+    [
+     24,
+     1,
+     1,
+     128
+    ]
+   ],
+   "L2.op.attn.indexer.k_norm.out": [
+    "bfloat16",
+    [
+     24,
+     1,
+     1,
+     128
+    ]
+   ],
+   "L2.op.attn.indexer.wq_b.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     1280
+    ]
+   ],
+   "L2.op.attn.indexer.wq_b.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     4096
+    ]
+   ],
+   "L2.op.attn.indexer.weights_proj.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L2.op.attn.indexer.weights_proj.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     32
     ]
    ],
    "L2.indexer_topk": [
@@ -2474,12 +4429,187 @@
      512
     ]
    ],
+   "L2.op.attn.wo_b.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     8192
+    ]
+   ],
+   "L2.op.attn.wo_b.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
    "L2.attn_out": [
     "bfloat16",
     [
      48,
      1,
      1,
+     5120
+    ]
+   ],
+   "L2.op.hc.attn.expanded": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     4,
+     5120
+    ]
+   ],
+   "L2.op.hc.ffn.pre": [
+    "float32",
+    [
+     48,
+     1,
+     1,
+     4
+    ]
+   ],
+   "L2.op.hc.ffn.post": [
+    "float32",
+    [
+     48,
+     1,
+     1,
+     4
+    ]
+   ],
+   "L2.op.hc.ffn.comb": [
+    "float32",
+    [
+     48,
+     1,
+     1,
+     4,
+     4
+    ]
+   ],
+   "L2.op.hc.ffn.collapsed": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L2.op.ffn_norm.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L2.op.ffn_norm.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L2.op.ffn.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L2.op.ffn.gate.weights": [
+    "float32",
+    [
+     48,
+     1,
+     6
+    ]
+   ],
+   "L2.op.ffn.gate.indices": [
+    "int64",
+    [
+     48,
+     1,
+     6
+    ]
+   ],
+   "L2.op.ffn.shared_experts.w1.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     5120
+    ]
+   ],
+   "L2.op.ffn.shared_experts.w1.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     2304
+    ]
+   ],
+   "L2.op.ffn.shared_experts.w3.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     5120
+    ]
+   ],
+   "L2.op.ffn.shared_experts.w3.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     2304
+    ]
+   ],
+   "L2.op.ffn.shared_experts.w2.in": [
+    "bfloat16",
+    [
+     48,
+     1,
+     2304
+    ]
+   ],
+   "L2.op.ffn.shared_experts.w2.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     5120
+    ]
+   ],
+   "L2.op.ffn.out": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
+    ]
+   ],
+   "L2.op.hc.ffn.expanded": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     4,
      5120
     ]
    ],
@@ -2500,6 +4630,15 @@
      1,
      1,
      4
+    ]
+   ],
+   "L2.op.hc.final.collapsed": [
+    "bfloat16",
+    [
+     48,
+     1,
+     1,
+     5120
     ]
    ]
   },

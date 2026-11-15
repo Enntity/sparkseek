@@ -29,16 +29,16 @@
   "attention": {
    "prefill_queries": 244,
    "prefill": {
-    "exact_math_bf16_bits_equal": 0.8277433514595032,
-    "exact_math_rel_l2": 0.001314914977429362,
-    "kernel_schedule_bf16_bits_equal": 0.9998878836631775,
-    "kernel_schedule_rel_l2": 2.4707508008004138e-05
+    "exact_math_bf16_bits_equal": 0.8274919390678406,
+    "exact_math_rel_l2": 0.0013098763578487306,
+    "kernel_schedule_bf16_bits_equal": 0.9998862743377686,
+    "kernel_schedule_rel_l2": 2.100475375833888e-05
    },
    "decode": {
-    "exact_math_bf16_bits_equal": 0.8311303853988647,
-    "exact_math_rel_l2": 0.0013445266038261698,
-    "kernel_schedule_bf16_bits_equal": 0.9997800588607788,
-    "kernel_schedule_rel_l2": 3.522327867769776e-05
+    "exact_math_bf16_bits_equal": 0.8309434652328491,
+    "exact_math_rel_l2": 0.0013358470662273448,
+    "kernel_schedule_bf16_bits_equal": 0.9997406005859375,
+    "kernel_schedule_rel_l2": 3.924265771771349e-05
    }
   },
   "window": {
@@ -53,16 +53,16 @@
   "attention": {
    "prefill_queries": 244,
    "prefill": {
-    "exact_math_bf16_bits_equal": 0.8422789573669434,
-    "exact_math_rel_l2": 0.0011403747564975122,
-    "kernel_schedule_bf16_bits_equal": 0.999671995639801,
-    "kernel_schedule_rel_l2": 4.027678959996695e-05
+    "exact_math_bf16_bits_equal": 0.8426238298416138,
+    "exact_math_rel_l2": 0.0011373540195802132,
+    "kernel_schedule_bf16_bits_equal": 0.999707043170929,
+    "kernel_schedule_rel_l2": 4.145364342659714e-05
    },
    "decode": {
-    "exact_math_bf16_bits_equal": 0.860907256603241,
-    "exact_math_rel_l2": 0.0010531711635636289,
-    "kernel_schedule_bf16_bits_equal": 0.9987443685531616,
-    "kernel_schedule_rel_l2": 8.562671091547507e-05
+    "exact_math_bf16_bits_equal": 0.8611984252929688,
+    "exact_math_rel_l2": 0.0010455990240654707,
+    "kernel_schedule_bf16_bits_equal": 0.9987850189208984,
+    "kernel_schedule_rel_l2": 8.841948719895988e-05
    }
   },
   "window": {
