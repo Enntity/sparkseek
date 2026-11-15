@@ -1,0 +1,58 @@
+{
+ "L0.block_in": {
+  "rel_l2": 0.0,
+  "bits_equal": 1.0
+ },
+ "L0.attn_in": {
+  "rel_l2": 0.0,
+  "bits_equal": 1.0
+ },
+ "L0.attn_out": {
+  "rel_l2": 0.000224,
+  "bits_equal": 0.9926
+ },
+ "L0.block_out": {
+  "rel_l2": 0.001865,
+  "bits_equal": 0.7815
+ },
+ "L1.engram_in": {
+  "rel_l2": 0.001865,
+  "bits_equal": 0.7815
+ },
+ "L1.engram_out": {
+  "rel_l2": 0.001717,
+  "bits_equal": 0.8023
+ },
+ "L1.block_in": {
+  "rel_l2": 0.001717,
+  "bits_equal": 0.8023
+ },
+ "L1.attn_in": {
+  "rel_l2": 0.003323,
+  "bits_equal": 0.7012
+ },
+ "L1.attn_out": {
+  "rel_l2": 0.028208,
+  "bits_equal": 0.0601
+ },
+ "L1.block_out": {
+  "rel_l2": 0.016643,
+  "bits_equal": 0.3872
+ },
+ "L2.block_in": {
+  "rel_l2": 0.016643,
+  "bits_equal": 0.3872
+ },
+ "L2.attn_in": {
+  "rel_l2": 0.020984,
+  "bits_equal": 0.0928
+ },
+ "L2.attn_out": {
+  "rel_l2": 0.050373,
+  "bits_equal": 0.0359
+ },
+ "L2.block_out": {
+  "rel_l2": 0.029627,
+  "bits_equal": 0.2449
+ }
+}

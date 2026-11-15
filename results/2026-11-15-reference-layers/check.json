@@ -1,0 +1,90 @@
+{
+ "prefill": 1401,
+ "decode": 48,
+ "L0": {
+  "attention": {
+   "prefill_queries": 244,
+   "prefill": {
+    "exact_math_bf16_bits_equal": 0.8169117569923401,
+    "exact_math_rel_l2": 0.00124506023165795,
+    "kernel_schedule_bf16_bits_equal": 0.9999397993087769,
+    "kernel_schedule_rel_l2": 1.6619323066010966e-05
+   },
+   "decode": {
+    "exact_math_bf16_bits_equal": 0.8145332336425781,
+    "exact_math_rel_l2": 0.0012749613694577953,
+    "kernel_schedule_bf16_bits_equal": 0.9997730255126953,
+    "kernel_schedule_rel_l2": 6.527812191762895e-05
+   }
+  },
+  "window": {
+   "after_prefill_bits_equal": true,
+   "decode_writes_only_slot_pos_mod_window": true,
+   "after_decode_bits_equal_last_step": true,
+   "prefill_last_query_window": true,
+   "decode_last_query_slots_oldest_first": true
+  }
+ },
+ "L1": {
+  "attention": {
+   "prefill_queries": 244,
+   "prefill": {
+    "exact_math_bf16_bits_equal": 0.8277433514595032,
+    "exact_math_rel_l2": 0.001314914977429362,
+    "kernel_schedule_bf16_bits_equal": 0.9998878836631775,
+    "kernel_schedule_rel_l2": 2.4707508008004138e-05
+   },
+   "decode": {
+    "exact_math_bf16_bits_equal": 0.8311303853988647,
+    "exact_math_rel_l2": 0.0013445266038261698,
+    "kernel_schedule_bf16_bits_equal": 0.9997800588607788,
+    "kernel_schedule_rel_l2": 3.522327867769776e-05
+   }
+  },
+  "window": {
+   "after_prefill_bits_equal": true,
+   "decode_writes_only_slot_pos_mod_window": true,
+   "after_decode_bits_equal_last_step": true,
+   "prefill_last_query_window": true,
+   "decode_last_query_slots_oldest_first": true
+  }
+ },
+ "L2": {
+  "attention": {
+   "prefill_queries": 244,
+   "prefill": {
+    "exact_math_bf16_bits_equal": 0.8422789573669434,
+    "exact_math_rel_l2": 0.0011403747564975122,
+    "kernel_schedule_bf16_bits_equal": 0.999671995639801,
+    "kernel_schedule_rel_l2": 4.027678959996695e-05
+   },
+   "decode": {
+    "exact_math_bf16_bits_equal": 0.860907256603241,
+    "exact_math_rel_l2": 0.0010531711635636289,
+    "kernel_schedule_bf16_bits_equal": 0.9987443685531616,
+    "kernel_schedule_rel_l2": 8.562671091547507e-05
+   }
+  },
+  "window": {
+   "after_prefill_bits_equal": true,
+   "decode_writes_only_slot_pos_mod_window": true,
+   "after_decode_bits_equal_last_step": true,
+   "prefill_last_query_window": true,
+   "decode_last_query_slots_oldest_first": true
+  },
+  "compressed_kv": {
+   "groups_after_prefill": 700,
+   "prefill_bf16_bits_equal": 1.0,
+   "prefill_rel_l2": 0.0,
+   "decode_groups_complete_at": [
+    1401,
+    1403,
+    1405,
+    1407
+   ],
+   "decode_groups_complete_when_pos_plus_1_divides": true,
+   "decode_bf16_bits_equal": 1.0,
+   "decode_rel_l2": 0.0
+  }
+ }
+}
