@@ -11,9 +11,8 @@ loads or serves yet.
 ## Branch
 
 `upstream/deepseek-v41-flash-20261114`, cut from Atlas-Inf `main` at
-`d080d6b7d`, so the series stays proposable upstream. It is local and
-unpushed as of 2026-11-15; `install/atlas-source.json` still pins the earlier
-`upstream/deepseek-v41-flash-20261026` (`7f3213c0`) until it is pushed. The product
+`d080d6b7d`, so the series stays proposable upstream. It replaces
+`upstream/deepseek-v41-flash-20261026`, which was cut at `504063ad`. The product
 build will stack it on the shared engine layer SparkGLM and SparkQwen use
 (`upstream/atlas-shared-*`) once there is something to serve. Pinned in `install/atlas-source.json`.
 

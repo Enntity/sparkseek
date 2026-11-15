@@ -50,7 +50,7 @@ mHC and attention projections, but its attention cache is new: a 128-token
 window on every layer, compressed KV and indexer top-k produced at a few layers
 and shared by the layers after them, a two-level top-k, and Engram n-gram
 tables. So it is its own model type, `deepseek_v41`, on the Enntity/atlas
-branch `upstream/deepseek-v41-flash-20261026`
+branch `upstream/deepseek-v41-flash-20261114`
 ([docs/ENGINE.md](docs/ENGINE.md)).
 
 ## Credits
