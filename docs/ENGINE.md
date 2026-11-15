@@ -4,13 +4,16 @@
 SparkSeek serves DeepSeek-V4.1-Flash-1017 with
 [Atlas](https://github.com/Enntity/atlas), like SparkGLM and SparkQwen. This
 page records what Atlas already has, what V4.1 needs that it does not, and the
-order the work lands in. Status as of 2026-10-26: CPU-side groundwork only; no
-GPU code has been written or run.
+order the work lands in. Status as of 2026-11-15: steps 1 to 5 are done, and
+step 6's kernel target compiles and passes its GPU test on a Spark. No model
+loads or serves yet.
 
 ## Branch
 
-`upstream/deepseek-v41-flash-20261026` in Enntity/atlas, cut from Atlas-Inf
-`main` at `504063ad`, so the series stays proposable upstream. The product
+`upstream/deepseek-v41-flash-20261114`, cut from Atlas-Inf `main` at
+`d080d6b7d`, so the series stays proposable upstream. It is local and
+unpushed as of 2026-11-15; `install/atlas-source.json` still pins the earlier
+`upstream/deepseek-v41-flash-20261026` (`7f3213c0`) until it is pushed. The product
 build will stack it on the shared engine layer SparkGLM and SparkQwen use
 (`upstream/atlas-shared-*`) once there is something to serve. Pinned in `install/atlas-source.json`.
 
@@ -84,26 +87,58 @@ drafter and TP layout.
    draws match numpy; row ids match a transcription of the reference
    `NgramHashState` over the 1017 tokenizer.
 
+3. **Compressed vocab.** `tokenizer/engram_dsv41.rs` builds Engram's token
+   map with the `tokenizers` crate's normalizers. On the 1017 tokenizer:
+   129,280 ids to 99,092, SHA-256 `c60a8632…59fe46481`, as the reference. A
+   tokenizer that compresses to another size is refused at serve start.
+4. **V4.1 prompt encoding and DSML parser.** `Dialect::V41` inside the V4
+   encoder (`tokenizer/deepseek_v4/`). Byte-exact on DeepSeek's five fixture
+   pairs and eight more cases from its `encoding.py`. The repository's later
+   `chat_template.jinja` (revision `08c8657f`) renders the same bytes on the
+   nine cases it accepts; it refuses string tool-call arguments. OpenAI effort
+   names map as that template maps them.
+5. **Weight manifest.** `preflight/deepseek_v41.rs` equals the headers of the
+   release (96,085 tensors), NVIDIA's NVFP4 pack (188,245) and the EXL3
+   2.5 bpw pack (192,496). Nothing calls it at load yet. The downloaded
+   release's headers equal the pinned ones.
+
 ## Next, in order
 
-Each step names the check that accepts it. "Spark" marks the first step that
-needs one.
+Each step names the check that accepts it. "Spark" marks a check that needs
+one.
 
-3. **Compressed vocab.** Build Engram's token map from `tokenizer.json` with
-   the `tokenizers` crate's normalizers (NFKC, NFD, strip accents, lowercase,
-   whitespace collapse) in `spark-server`. Accept: 99,092 ids and SHA-256
-   `c60a8632…59fe46481` of the little-endian i32 map for the 1017 tokenizer.
-4. **V4.1 prompt encoding and DSML parser.** Port `encoding/encoding.py` beside
-   the V4 renderer, select it on `deepseek_v41`. Accept: DeepSeek's five
-   `encoding/tests` pairs byte for byte, and the tool parser on the new tag
-   names.
-5. **Weight manifest and preflight.** Expected names, dtypes and shapes for the
-   release, NVIDIA's NVFP4 pack and the EXL3 2.5 bpw pack, checked against the
-   headers; the 32x32 FP8 scale shapes; DSpark stage tensors. Accept: the
-   manifest matches all three checkpoints' headers with no extras.
-6. **Kernel target.** `kernels/gb10/deepseek-v4.1-flash/` (`model_type
-   deepseek_v41`, `hidden_size 5120`) layering V4's MoE and mHC kernels, plus a
-   32-wide-block FP8 GEMV. Spark: `--check-kernels` resolves every handle.
+6. **Kernel target.** `kernels/gb10/deepseek-v4.1-flash/` compiles
+   deepseek-v4-flash's kernels (`kernel_source`) plus an overlay. Done so far,
+   on a Spark (2026-11-15):
+   - The target compiles: 216 kernels.
+   - FP8 needs no new kernel. The release scales FP8 per 32 x 32 block with
+     UE8M0; `weight_map::fp8_block_scales_to_rows` repeats each scale row, and
+     decode then runs on GLM's exact tensor-core MXFP8 tiers (`mxfp8_gemv`),
+     which the overlay includes. V4's own FP8 kernels assume 128 x 128 blocks.
+   - GPU test `block32`: parity with the BF16 GEMV and row invariance at nine
+     V4.1 shapes, and on eleven of the release's own projections (attention,
+     shared experts, indexer, Engram, DSpark).
+   - Every UE8M0 scale in the release is inside the range where the BF16
+     expansion is exact: FP8 dense 2^-13 to 2^-6, routed experts 2^-16 to 2^0,
+     Engram 2^-18 to 2^-4.
+
+   Not done: `--check-kernels` resolving every handle. It boots `build_model`,
+   which loads weights, so it needs the loader below and, for the full model,
+   all four Sparks. Prefill needs a 32-block FP8 GEMM; V4's are 128-block.
+
+   What a `deepseek_v41` loader needs (a read of the V4 path, 2026-11-15):
+   - Reusable as they are: embed, norm and head names; the attention
+     projections, norms and attention sink; the mHC tensors; the router; routed
+     experts (V4's native MXFP4 path, `quantized_mxfp4_e8m0`, reads the same
+     I8 + E8M0 layout).
+   - Decisions on `model_type`: the factory arm, vanilla norm weights, the
+     E8M0 expert kernel series, the KV-only prefix cache rule.
+   - Different in V4.1: the compressor exists only on KV source layers, has no
+     `ape`, and `wgate` only where the ratio is above 1; there is no model-level
+     `hc_head`; FP8 projections must go to the MXFP8 path, not V4's FP8 twins,
+     which would load and compute wrong values.
+   - No V4 equivalent: indexer weights, Engram, the image routing bias, the
+     DSpark stages, the vision tower.
 7. **Per-sequence attention cache.** Paged window ring (128 slots) per layer,
    compressed FP4 KV and index keys per source layer per sequence, compressor
    partial-group state per sequence; correct across chunked prefill, verify
