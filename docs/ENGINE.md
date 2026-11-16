@@ -4,9 +4,10 @@
 SparkSeek serves DeepSeek-V4.1-Flash-1017 with
 [Atlas](https://github.com/Enntity/atlas), like SparkGLM and SparkQwen. This
 page records what Atlas already has, what V4.1 needs that it does not, and the
-order the work lands in. Status as of 2026-11-15: steps 1 to 5 are done, and
-step 6's kernel target compiles and passes its GPU test on a Spark. No model
-loads or serves yet.
+order the work lands in. Status as of 2026-11-15: steps 1 to 5 are done,
+step 6's kernel target compiles, and a whole block replays DeepSeek's layers 0
+to 2 on the release's weights in plain, slow kernels (step 7). No model loads
+or serves yet.
 
 ## Branch
 
@@ -150,14 +151,44 @@ one.
    prefilled and 48 decoded. What it fixes for this step:
    - The window ring and the compressed KV reproduce bit for bit from a short
      recipe, so the engine's caches are compared for equality.
-   - Attention output is accepted within about 1.3e-3 relative of the
-     reference on the reference's own inputs. Tighter needs the reference's
-     BF16 weight rounding and 64-key schedule.
+   - The attention kernel follows the reference kernel's schedule: keys 64
+     at a time in index order, a running maximum, weights rounded to BF16.
+     An exact softmax is 1.3e-3 from the reference, and the block quantizes
+     the attention's output to FP8 before projecting it, which makes that
+     1e-2 at the sublayer's output. On the schedule 99.9% of the attention's
+     values equal the reference's.
    - The reference has no chunked prefill, and its own decode and prefill
      paths are 5% apart by layer 2. Chunked prefill is checked against a
      single prefill, and no check compares whole-model logits tightly.
    - The reference's 64-head attention kernel does not fit a GB10's shared
      memory; it ran 16 heads at a time.
+
+   Built so far (`layers/deepseek_v41/`, kernels `dsv41_*.cu`), each piece
+   replayed on a Spark from its recorded input to its recorded output:
+   - FP8 projections with the reference's FP8 activation step: 99.99% of
+     values equal. Window keys: bit-identical. Compressed keys: 2 values of
+     51,200 differ.
+   - Hyper-Connections with `pre` carried from site to site, which is where
+     V4.1 differs from V4: 99.99%.
+   - MoE: routing identical on 200 of 200 tokens a layer; output bit-identical
+     on layer 0 and 99.998% equal on layer 2. The shared expert keeps its FP8
+     weights.
+   - Compressor at ratio 2 and Engram's gate: 99.95% and 99.995%.
+   - The whole block token by token: attention sublayer 1.1e-3 to 1.9e-3 from
+     the reference, the rest of the block 98.9% to 99.7% equal.
+
+   Two things this fixes for every later step:
+   - The model amplifies single rounding steps. One compressed key that
+     differs in 2 of its 512 values moves every later token's attention by
+     6e-3. Pieces are checked one at a time from recorded inputs, and a block
+     test hands later tokens the reference's key once a group is compared.
+   - Decode and prefill build a query's key row the same way, so they give
+     the attention kernel the same keys in the same places.
+
+   Not built: the per-sequence state is contiguous, not paged; a query may
+   see at most `index_topk` compressed groups until step 8; the compressor at
+   ratio 1; chunked prefill, verify and batching; the `TransformerLayer` and
+   loader that would serve it. The kernels are one thread per output row.
 8. **Indexer and candidate blocks.** Sources compute scores (TP-split heads,
    summed across ranks), consumers reuse top-k; layer 20 picks candidate
    blocks. Spark: top-k agreement with the reference past 32K tokens.

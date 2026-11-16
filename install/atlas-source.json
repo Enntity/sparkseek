@@ -1,10 +1,10 @@
 {
   "schema": "sparkseek.atlas-engine-source/v2",
-  "note": "Not yet servable: config, Engram ids and token map, prompt encoding, weight manifest and the kernel target are in; no loader or factory arm yet. Build tooling will refuse any other tree, as SparkGLM's and SparkQwen's do.",
+  "note": "Not yet servable: config, Engram ids and token map, prompt encoding, weight manifest, the kernel target and a plain-kernel block that replays the reference are in; no loader or factory arm yet. Build tooling will refuse any other tree, as SparkGLM's and SparkQwen's do.",
   "repository": "https://github.com/Enntity/atlas.git",
   "branch": "upstream/deepseek-v41-flash-20261114",
-  "commit": "ce081451eac71fffec2f1947b1a77a14b93de851",
-  "tree": "9f644bc44cdaf31acbec98740270ad9adaeecc51",
+  "commit": "09b86376b0dbc4d8a2cf4de4d6660594023a1ad3",
+  "tree": "25a5c6590bf863f10b20680e78eb1a99a76aee59",
   "layers": {
     "atlas_inf_main_base": "d080d6b7db93bdc83acd737d2493fa53f3279371"
   },
