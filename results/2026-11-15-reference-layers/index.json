@@ -1,0 +1,79 @@
+{
+ "prefill_keys_bit_equal": true,
+ "prefill": {
+  "queries": 1401,
+  "topk_rows_equal_recorded": 1401,
+  "ties": {
+   "rows_with_a_tie_at_the_cut": 289,
+   "kept_lowest_positions": 289,
+   "kept_highest_positions": 0
+  },
+  "explicit": {
+   "dot_exact_in_f32": true,
+   "per_head_differ": 0,
+   "scores_differ": 0,
+   "scores": 490700
+  }
+ },
+ "decode": {
+  "queries": 48,
+  "topk_rows_equal_recorded": 48,
+  "ties": {
+   "rows_with_a_tie_at_the_cut": 39,
+   "kept_lowest_positions": 39,
+   "kept_highest_positions": 0
+  },
+  "explicit": {
+   "per_head_differ": 132137,
+   "scores_differ": 5996,
+   "scores": 34200,
+   "dot_exact_in_f32": true
+  }
+ },
+ "tensors": {
+  "prefill.q": [
+   "bfloat16",
+   [
+    1401,
+    32,
+    128
+   ]
+  ],
+  "prefill.weights": [
+   "bfloat16",
+   [
+    1401,
+    32
+   ]
+  ],
+  "prefill.score": [
+   "bfloat16",
+   [
+    1401,
+    700
+   ]
+  ],
+  "decode.q": [
+   "bfloat16",
+   [
+    48,
+    32,
+    128
+   ]
+  ],
+  "decode.weights": [
+   "bfloat16",
+   [
+    48,
+    32
+   ]
+  ],
+  "decode.score": [
+   "bfloat16",
+   [
+    48,
+    724
+   ]
+  ]
+ }
+}

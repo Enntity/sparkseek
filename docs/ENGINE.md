@@ -4,9 +4,10 @@
 SparkSeek serves DeepSeek-V4.1-Flash-1017 with
 [Atlas](https://github.com/Enntity/atlas), like SparkGLM and SparkQwen. This
 page records what Atlas already has, what V4.1 needs that it does not, and the
-order the work lands in. Status as of 2026-11-15: steps 1 to 5 are done, and
-step 6's kernel target compiles and passes its GPU test on a Spark. No model
-loads or serves yet.
+order the work lands in. Status as of 2026-11-15: steps 1 to 5 are done,
+step 6's kernel target compiles, every one of the 40 blocks replays DeepSeek's
+on the release's weights in plain, slow kernels (step 7), and the indexer
+chooses the reference's 512 positions (step 8). No model loads or serves yet.
 
 ## Branch
 
@@ -150,17 +151,89 @@ one.
    prefilled and 48 decoded. What it fixes for this step:
    - The window ring and the compressed KV reproduce bit for bit from a short
      recipe, so the engine's caches are compared for equality.
-   - Attention output is accepted within about 1.3e-3 relative of the
-     reference on the reference's own inputs. Tighter needs the reference's
-     BF16 weight rounding and 64-key schedule.
+   - The attention kernel follows the reference kernel's schedule: keys 64
+     at a time in index order, a running maximum, weights rounded to BF16.
+     An exact softmax is 1.3e-3 from the reference, and the block quantizes
+     the attention's output to FP8 before projecting it, which makes that
+     1e-2 at the sublayer's output. On the schedule 99.9% of the attention's
+     values equal the reference's.
    - The reference has no chunked prefill, and its own decode and prefill
      paths are 5% apart by layer 2. Chunked prefill is checked against a
      single prefill, and no check compares whole-model logits tightly.
    - The reference's 64-head attention kernel does not fit a GB10's shared
      memory; it ran 16 heads at a time.
+
+   Built so far (`layers/deepseek_v41/`, kernels `dsv41_*.cu`), each piece
+   replayed on a Spark from its recorded input to its recorded output:
+   - FP8 projections with the reference's FP8 activation step: 99.99% of
+     values equal. Window keys: bit-identical. Compressed keys: 2 values of
+     51,200 differ.
+   - Hyper-Connections with `pre` carried from site to site, which is where
+     V4.1 differs from V4: 99.99%.
+   - MoE: routing identical on 200 of 200 tokens a layer; output bit-identical
+     on layer 0 and 99.998% equal on layer 2. The shared expert keeps its FP8
+     weights.
+   - Compressor at ratio 2 and Engram's gate: 99.95% and 99.995%.
+   - The whole block token by token: attention sublayer 1.1e-3 to 1.9e-3 from
+     the reference, the rest of the block 98.9% to 99.7% equal.
+
+   Two things this fixes for every later step:
+   - The model amplifies single rounding steps. One compressed key that
+     differs in 2 of its 512 values moves every later token's attention by
+     6e-3. Pieces are checked one at a time from recorded inputs, and a block
+     test hands later tokens the reference's key once a group is compared.
+   - Decode and prefill build a query's key row the same way, so they give
+     the attention kernel the same keys in the same places.
+
+   All 40 blocks, each on 200 tokens from DeepSeek's
+   [full-depth recording](../results/2026-11-15-reference-depth/RESULT.md),
+   with the role the release's config gives each layer (key source, index
+   source, reader, ratio 2 or 1):
+   - attention sublayer 1.1e-3 to 7.5e-3 from the reference, the furthest at
+     layers 20, 21 and 35. On those three the attention kernel still gives
+     99.91% to 99.94% of the reference's values from its recorded operands,
+     as on the first layers, so the larger figure is the same rounding steps
+     carried through the FP8 step and the output projection;
+   - the rest of the block 98.1% to 99.8% of stream values equal, at most
+     4e-4 away;
+   - compressed keys and index keys at the four key sources: 0 to 3 values
+     of up to 102,400 differ;
+   - the final collapse after layer 39: every value equal.
+
+   Not built: the per-sequence state is contiguous, not paged; chunked
+   prefill, verify and batching; the `TransformerLayer` and loader that would
+   serve it. The kernels are one thread per output row.
 8. **Indexer and candidate blocks.** Sources compute scores (TP-split heads,
    summed across ranks), consumers reuse top-k; layer 20 picks candidate
    blocks. Spark: top-k agreement with the reference past 32K tokens.
+
+   Built in plain form (`index.rs`, `index_recipe.rs`, `block_index.rs`,
+   `dsv41_index.cu`) and wired into the block. What the
+   [recording](../results/2026-11-15-reference-layers/RESULT.md) fixes:
+   - A score is `BF16(sum_h BF16(relu(BF16(q_h . key)) * w_h))`. Query heads
+     and index keys are FP4 values, so each dot product is exact. The kernel
+     gives all 490,700 recorded prefill scores bit for bit.
+   - Scores are BF16, so equal scores where the top-512 cuts are the usual
+     case: three queries in four. The reference keeps the earliest positions,
+     and the engine does the same.
+   - The sum over heads stays in FP32 until one rounding, so ranks that hold
+     some of the heads add their parts first and get the one-rank result.
+   - Layer 2 token by token over the 1,449 recorded tokens: 375 of the 376
+     prefill queries that choose pick exactly the reference's 512, and the
+     other shares 510.
+   - Layer 20, the first at ratio 1 and the candidate source: 885 of 889
+     exact, the least sharing 509. Layer 24, which scores layer 20's index
+     keys with its own queries: 884 of 889, the least sharing 506.
+   - On decode steps that score an odd number of keys, the reference's scores
+     carry its library's rounding. The engine computes the exact scores
+     there and shares 507 or more of the 512; the reference's own two runs
+     share 499 to 508.
+
+   Not built: the choice runs on the host from scores copied back. Not
+   checked: candidate blocks cutting anything. They hold 16,384 positions and
+   the recorded prompt has 1,449, so every position is a candidate there; the
+   rule itself is unit-tested against the reference's function. That and the
+   Spark check past 32K tokens need a longer recording.
 9. **Engram layer.** Generalize the PLE layer to two Engram layers, gather FP8
    rows with E8M0 group scales from the NVMe row cache, gate per mHC stream
    (signed-sqrt sigmoid), zero the gate on image tokens. Spark: layer output
