@@ -79,6 +79,46 @@ the saved tensors ([check.json](check.json)):
 | Attention output, following the kernel's schedule: 64 keys at a time in index order, running maximum, weights rounded to BF16 before they multiply the keys | 0, 1, 2 | 99.88% to 99.99% of output bits equal; 2e-5 to 9e-5 relative |
 | Attention output, plain softmax in float64 | 0, 1, 2 | 81% to 86% of output bits equal; 1.0e-3 to 1.3e-3 relative |
 
+## The indexer, replayed
+
+`record.py` saves the indexer's projections and its top-512, not the scores
+between them. `index_replay.py` runs the reference's own scoring lines
+(`Indexer.forward`) on the recorded projections and saves the quantized
+queries, head weights and scores ([index.json](index.json)).
+
+| Check | Result |
+|---|---|
+| Index keys rebuilt from the recorded `k_norm` output | bit-identical, all 700 prefill groups |
+| Top-512 from the replayed scores against the recorded top-512 | equal on all 1,401 prefill queries and all 48 decode steps |
+| Prefill scores against the arithmetic written out below | all 490,700 bit-identical |
+| Queries that choose (more than 512 positions visible) with equal scores where the top-512 cuts | 289 of 376 in prefill, 39 of 48 in decode |
+| Which of the equal positions the reference keeps | the earliest, on all 328 |
+| Decode steps with an even number of index keys | scores bit-identical to the arithmetic below |
+| Decode steps with an odd number of index keys | about a quarter of per-head products are off, typically by 0.4% |
+| Top-512 of run A's decode steps against run B's prefill of the same positions | 499 to 508 of 512 shared |
+
+The arithmetic, with every rounding step:
+
+```
+head[h, t] = BF16(q[h] . key[t])          # FP4 values, so the dot product is exact
+score[t]   = BF16(sum_h BF16(relu(head[h, t]) * w[h]))    # the sum in FP32
+w[h]       = BF16(weights_proj(x))[h] / 64                # 128^-0.5 * 32^-0.5
+```
+
+Scores are BF16, eight bits of mantissa, so ties at the cut are the usual
+case, and how they are broken is part of what a query attends to.
+
+The odd-count decode steps are the reference's library, not the model: PyTorch
+hands the BF16 product to cuBLAS, which on a GB10 takes a path for an odd
+dimension that is a few BF16 steps from exact. One key more or fewer and the
+same query scores exactly. What the reference chose on those steps follows its
+scores, so an engine that computes the exact scores cannot share all 512
+positions with it there. The reference's own two runs share 499 to 508.
+
+`index_fixture.py` writes the small fixture the engine's host-side rules are
+unit-tested with: the reference's top-k and its `select_candidate_blocks` on
+six recorded score rows, at a top-k of 64 and 16 blocks of 8.
+
 ## What it means for the engine
 
 - **Judge one layer at a time, on the reference's inputs.** Whole-model logits
@@ -97,11 +137,12 @@ the saved tensors ([check.json](check.json)):
 
 ## Not covered
 
-- The indexer's scores and its top-512 choice are saved (`L2.indexer_topk`)
-  but not recomputed; that is step 8.
+- Candidate blocks: the function is replayed on recorded scores at a small
+  block count. Layer 20, the first to run it, is in the
+  [full-depth recording](../2026-11-15-reference-depth/RESULT.md).
 - The Engram layer's input and output are saved but not recomputed; step 9.
-- Layers past 2: candidate blocks start at layer 20, compression ratio 1 at
-  layer 20, the draft layers after 39.
+- Layers past 2 are in the full-depth recording. The draft layers after 39
+  are in neither.
 - More than one rank. This is the reference at `world_size = 1`.
 
 ## Files
@@ -113,4 +154,5 @@ and each MoE's input, routing and output (`L<layer>.op.<module>.in`, `.out`),
 so one operation can be checked from its own recorded input. The tensors are
 3.3 GB and are not in the repository; `tensors.sha256` lists their hashes from
 this run, and `record.py` rebuilds them from the public release. A second run
-in a new process gave the same hashes.
+in a new process gave the same hashes. `index_replay.py` adds
+`A_index.safetensors` (14 MB) to them from the recording.
