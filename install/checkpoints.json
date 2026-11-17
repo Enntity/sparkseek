@@ -1,6 +1,6 @@
 {
   "schema": "sparkseek.checkpoints/v1",
-  "note": "Weights SparkSeek targets, pinned by revision. Capacity per Spark is from results/2026-10-26-weights and results/2026-10-30-nvfp4-1017 (headers only; nothing served yet). Engram tables stay on each Spark's NVMe behind a row cache in every profile.",
+  "note": "Weights SparkSeek targets, pinned by revision. Capacity per Spark is from results/2026-10-26-weights and results/2026-10-30-nvfp4-1017 (headers only; start.sh serves deepseek-fp8-mxfp4, the other two are not served). Engram tables stay on each Spark's NVMe behind a row cache in every profile.",
   "checkpoints": {
     "deepseek-fp8-mxfp4": {
       "repo": "deepseek-ai/DeepSeek-V4.1-Flash-1017",

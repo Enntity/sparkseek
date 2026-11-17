@@ -17,7 +17,11 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - name: Tools
+      - name: Launch contract
+        run: python3 -m unittest discover -s install -p 'test_*.py' -v
+      - name: Tools and host checks
         run: python3 -m unittest discover -s tests -v
+      - name: Shell
+        run: shellcheck -S warning -e SC2054 start.sh gpu-clock-cap.sh install/*.sh
       - name: Result receipts
         run: for d in results/*/; do (cd "$d" && sha256sum -c --quiet SHA256SUMS); done
