@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-only
+# Build the SparkSeek image from the pinned Enntity/atlas commit
+# (atlas-source.json) and this directory. The image tag is the git tree hash of
+# install/, so a published image and a local build of the same checkout carry
+# the same tag. Never starts or stops anything. Run it on a Spark: the image is
+# arm64 and its kernels are compiled for the GB10.
+#
+#   build.sh         build the image, then print its tag
+#   build.sh --tag   print the tag only
+#
+# Adapted from SparkGLM's install/build.sh (AGPL-3.0-only).
+set -euo pipefail
+here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+product=$(cd "$here/.." && pwd)
+tree=$(git -C "$product" rev-parse HEAD:install)
+image=${SPARKSEEK_IMAGE_REPO:-ghcr.io/enntity/atlas-sparkseek}:${tree:0:12}
+[[ ${1:-} == --tag ]] && { echo "$image"; exit 0; }
+[[ $# == 0 ]] || { echo 'usage: build.sh [--tag]' >&2; exit 2; }
+[[ -z $(git -C "$product" status --porcelain --untracked-files=all -- install) ]] || {
+  echo 'install/ has local changes; commit them first (the image tag is its git tree)' >&2; exit 2; }
+version=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["version"])' "$here/release.json")
+read -r repo commit pin_tree < <(python3 -c 'import json,sys; m=json.load(open(sys.argv[1])); print(m["repository"], m["commit"], m["tree"])' "$here/atlas-source.json")
+
+mkdir -p "${SPARKSEEK_BUILD_DIR:=$HOME/.cache/sparkseek}"
+context=$(mktemp -d "$SPARKSEEK_BUILD_DIR/build.XXXXXX")
+trap 'rm -rf "$context"' EXIT
+# A shallow fetch of the pinned commit; Git LFS media (demo assets) is not needed.
+git init -q "$context/engine"
+GIT_LFS_SKIP_SMUDGE=1 git -C "$context/engine" fetch -q --depth 1 "$repo" "$commit"
+GIT_LFS_SKIP_SMUDGE=1 git -C "$context/engine" -c advice.detachedHead=false checkout -q --detach FETCH_HEAD
+[[ $(git -C "$context/engine" rev-parse HEAD) == "$commit" &&
+   $(git -C "$context/engine" rev-parse 'HEAD^{tree}') == "$pin_tree" ]] || {
+  echo "fetched engine is not the pinned Enntity/atlas tree $pin_tree" >&2; exit 1; }
+git -C "$product" archive HEAD install | tar -x -C "$context"
+cp "$here/dockerignore" "$context/.dockerignore"
+
+# Parallel compile jobs: ATLAS_BUILD_JOBS, else one per ~10 GiB of free memory
+# (nvcc on CUTLASS units takes several GiB each; GB10 memory is shared with the
+# host), at most half the cores and at least 2.
+jobs=${ATLAS_BUILD_JOBS:-$(awk -v cores="$(nproc)" '/MemAvailable/ {
+  j = int($2 / 1048576 / 10); if (j > cores / 2) j = int(cores / 2); if (j < 2) j = 2; print j }' /proc/meminfo)}
+args=(--build-arg "INSTALL_TREE=$tree" --build-arg "PRODUCT_VERSION=$version" --build-arg "BUILD_JOBS=$jobs" -f "$context/install/Dockerfile")
+echo "building $image with $jobs jobs" >&2
+# The engine's unit tests for this model (the `checks` stage) run unless
+# ATLAS_IMAGE_CHECKS=0, for builds whose engine commit already passed them.
+case ${ATLAS_IMAGE_CHECKS:-1} in
+  1) docker build "${args[@]}" --target checks "$context" >&2 ;;
+  0) ;;
+  *) echo 'ATLAS_IMAGE_CHECKS must be 0 or 1' >&2; exit 2 ;;
+esac
+docker build "${args[@]}" --target runtime -t "$image" "$context" >&2
+[[ $(docker image inspect -f '{{.Architecture}} {{index .Config.Labels "io.enntity.sparkseek.install-tree"}}' "$image") == "arm64 $tree" ]] || {
+  echo "built image $image has the wrong architecture or install-tree label" >&2; exit 1; }
+echo "$image"

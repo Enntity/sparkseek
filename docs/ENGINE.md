@@ -4,10 +4,15 @@
 SparkSeek serves DeepSeek-V4.1-Flash-1017 with
 [Atlas](https://github.com/Enntity/atlas), like SparkGLM and SparkQwen. This
 page records what Atlas already has, what V4.1 needs that it does not, and the
-order the work lands in. Status as of 2026-11-15: steps 1 to 5 are done,
-step 6's kernel target compiles, every one of the 40 blocks replays DeepSeek's
-on the release's weights in plain, slow kernels (step 7), and the indexer
-chooses the reference's 512 positions (step 8). No model loads or serves yet.
+order the work lands in. Status as of 2026-11-18: the pinned engine
+(`install/atlas-source.json`) loads DeepSeek's release as published and serves
+it on four Sparks, one sequence at a time: prefill in batches of 8,192 or
+16,384 rows shared out between the ranks, decode with the release's draft head
+and an exact verify, the Engram tables read from each Spark's NVMe through a
+row cache. Three Sparks are not served: the weights are split four ways
+([issue 5](https://github.com/Enntity/sparkseek/issues/5)). The steps below
+are the order the work landed in; where a step still says what is not built,
+the status here is the later word.
 
 ## Branch
 
@@ -238,6 +243,13 @@ one.
    rows with E8M0 group scales from the NVMe row cache, gate per mHC stream
    (signed-sqrt sigmoid), zero the gate on image tokens. Spark: layer output
    against the reference; cache hit rate on agent traffic.
+
+   Built in plain form (`engram.rs`, `dsv41_engram_rows`): from the table
+   rows a token's hash ids name to the stream. On 64 recorded tokens of each
+   Engram layer the looked-up values are bit-identical to the reference's
+   and the stream it leaves is 99.98% (layer 1) and 99.997% (layer 14)
+   equal. The hash ids and the NVMe row cache are wired to it since; the
+   image mask and the hit-rate check on agent traffic are not built.
 10. **TP=2 and TP=4.** Head-split attention and indexer, EP experts, vocab-split
     embed/head; latent KV replicated. Spark: TP2 and TP4 logits against TP1 of
     a 4-layer slice; full model on four Sparks.

@@ -1,10 +1,10 @@
 {
   "schema": "sparkseek.atlas-engine-source/v2",
-  "note": "Not yet servable: config, Engram ids and token map, prompt encoding, weight manifest, the kernel target, the indexer and plain-kernel blocks that replay the reference on all 40 layers are in; no loader or factory arm yet. Build tooling will refuse any other tree, as SparkGLM's and SparkQwen's do.",
+  "note": "Serves DeepSeek's release as published on four Sparks, four ranks joined in an RDMA ring: prefill, and decode with the release's draft head. Three Sparks are not served yet: the weight split is fixed at four parts. install/build.sh refuses any other tree, as SparkGLM's and SparkQwen's do.",
   "repository": "https://github.com/Enntity/atlas.git",
   "branch": "upstream/deepseek-v41-flash-20261114",
-  "commit": "d2dcde90b55d1224a3a3aefa2041815b111d4ee6",
-  "tree": "1e79a02e6261ccdfb05f95937c5c4ae5348096ea",
+  "commit": "8c71b62ee67ad1b470c90e381cbce81967a687c5",
+  "tree": "4d114aa8ed5c84b17d8fbe47084464af4b64e400",
   "layers": {
     "atlas_inf_main_base": "d080d6b7db93bdc83acd737d2493fa53f3279371"
   },
