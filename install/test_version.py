@@ -19,8 +19,8 @@ class VersionQueries(unittest.TestCase):
         self.assertEqual(pin['repository'], 'https://github.com/Enntity/atlas.git')
         self.assertEqual(pin['branch'], 'upstream/deepseek-v41-flash-20261114')
         self.assertEqual(pin['kernel_target'], 'deepseek-v4.1-flash')
-        self.assertEqual(pin['commit'], '8c71b62ee67ad1b470c90e381cbce81967a687c5')
-        self.assertEqual(pin['tree'], '4d114aa8ed5c84b17d8fbe47084464af4b64e400')
+        self.assertEqual(pin['commit'], 'bcef3befedc3fe4d815a9db5a948f9e4522becea')
+        self.assertEqual(pin['tree'], '802f737be41472f84cee3c433e47d018aeef5570')
         self.assertIn('Three Sparks are not served yet', pin['note'])
 
     def test_the_served_checkpoint_is_the_release_as_published(self):

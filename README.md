@@ -20,6 +20,13 @@ First speeds, one stream, through `./start.sh` at its defaults
 on (46 tok/s with it off). With `--prefill-rows 16384 --drafts 0` the same
 prefill takes 4.72 to 5.36 s.
 
+That receipt was recorded one engine pin back (`8c71b62e`). The engine pinned
+now runs a batch's attention faster and changes nothing else: on the same
+four Sparks the 16,384-row prefill took 4.35 s (7,350 tok/s) on the engine's
+own test harness, with the same tokens after a 32,000-token and a 9,000-token
+prompt. It has not been started through `./start.sh` yet, so there is no
+receipt for it here.
+
 ```sh
 git clone https://github.com/Enntity/sparkseek.git
 cd sparkseek
