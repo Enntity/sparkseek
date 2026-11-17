@@ -1,0 +1,3 @@
+11.1 s; 500 tokens: 'The image of a lighthouse is one of the most enduring in human culture'
+11.0 s; 500 tokens: '# LRU Cache Implementation\n\nBelow is a complete Python module implemen'
+8.8 s; 400 tokens: '[\n  {\n    "title": "The Clockwork Orchard",\n    "author": "Maribel Van'

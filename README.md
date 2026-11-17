@@ -13,7 +13,12 @@ serves DeepSeek's release as published on four Sparks joined in an RDMA ring:
 prefill, and decode with the release's draft head. Three Sparks are
 [not served yet](#three-sparks).
 
-Speeds: see results/ (receipt to be added)
+First speeds, one stream, through `./start.sh` at its defaults
+([receipt](results/2026-11-17-four-sparks-base/RESULT.md)): a cold
+32,000-token prefill in 4.87 to 5.45 s (5,875 to 6,567 tok/s), and replies at
+53 tok/s on prose, 96 on Python and 86.5 on JSON with the release's draft head
+on (46 tok/s with it off). With `--prefill-rows 16384 --drafts 0` the same
+prefill takes 4.72 to 5.36 s.
 
 ```sh
 git clone https://github.com/Enntity/sparkseek.git
@@ -83,7 +88,7 @@ Each is a `start.sh` option and a line in `.env`; the command line wins.
 |---|---|---|---|
 | `--sparks N` | `SPARKS` | 4 | Sparks serving together. Only 4 is served so far. |
 | `--drafts N` | `DRAFTS` | 5 | Tokens the release's draft head proposes each step, 0 to 15. 0 turns the draft head off. |
-| `--prefill-rows N` | `PREFILL_ROWS` | 8192 | Rows a prefill pass runs together: 8192 or 16384. |
+| `--prefill-rows N` | `PREFILL_ROWS` | 8192 | Rows a prefill pass runs together: 8192 or 16384. 16384 is quicker on long prompts and takes about 3 GB more a rank; with the draft head on it needs a Spark's memory to itself. |
 | `--context N` | `CONTEXT` | 131072 | The longest sequence, prompt and reply, in tokens; at most the model's 1,048,576. |
 | `--port N` | `PORT` | 8894 | The API's port on rank 0. Rank R also listens on this port + R, on its own loopback. |
 

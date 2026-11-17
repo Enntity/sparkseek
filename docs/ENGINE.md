@@ -4,7 +4,7 @@
 SparkSeek serves DeepSeek-V4.1-Flash-1017 with
 [Atlas](https://github.com/Enntity/atlas), like SparkGLM and SparkQwen. This
 page records what Atlas already has, what V4.1 needs that it does not, and the
-order the work lands in. Status as of 2026-11-18: the pinned engine
+order the work lands in. Status as of 2026-11-17: the pinned engine
 (`install/atlas-source.json`) loads DeepSeek's release as published and serves
 it on four Sparks, one sequence at a time: prefill in batches of 8,192 or
 16,384 rows shared out between the ranks, decode with the release's draft head
