@@ -13,24 +13,14 @@ serves DeepSeek's release as published on four Sparks joined in an RDMA ring:
 prefill, and decode with the release's draft head. Three Sparks are
 [not served yet](#three-sparks).
 
-First speeds, one stream, through `./start.sh` at its defaults
-([receipt](results/2026-11-17-four-sparks-base/RESULT.md)): a cold
-32,000-token prefill in 4.87 to 5.45 s (5,875 to 6,567 tok/s), and replies at
-53 tok/s on prose, 96 on Python and 86.5 on JSON with the release's draft head
-on (46 tok/s with it off). With `--prefill-rows 16384 --drafts 0` the same
-prefill takes 4.72 to 5.36 s.
-
-That receipt was recorded two engine pins back (`8c71b62e`). The pins since
-change no tokens. The first (`bcef3bef`) runs a batch's attention faster: on
-the same four Sparks the 16,384-row prefill took 4.35 s (7,350 tok/s) on the
-engine's own test harness, with the same tokens after a 32,000-token and a
-9,000-token prompt. The engine pinned now (`fb3b99b6`) picks a greedy step's
-token without reading the whole head and makes a drafted step cheaper:
-started by hand on the same four Sparks at 2,048 prefill rows, it replied at
-58 tok/s on prose, 104.5 on Python and 98 on JSON with the draft head on and
-50.4 to 50.8 with it off, with the same replies as the engine before it.
-Neither pin has been started through `./start.sh` yet, so there is no receipt
-for them here.
+Speeds, one stream, through `./start.sh` at its defaults
+([receipt](results/2026-11-19-four-sparks-head-pick/RESULT.md), three runs
+each): a cold 32,000-token prefill in 4.52 to 5.04 s (6,353 to 7,079 tok/s),
+and replies at 55 to 59 tok/s on prose, 100 to 104 on Python and 91 to 98 on
+JSON with the release's draft head on. With `--prefill-rows 16384` the same
+prefill takes 4.37 to 4.95 s, and with `--drafts 0` replies come at 46 to 49
+tok/s. The [first receipt](results/2026-11-17-four-sparks-base/RESULT.md) is
+two engine pins older.
 
 ```sh
 git clone https://github.com/Enntity/sparkseek.git
@@ -100,7 +90,7 @@ Each is a `start.sh` option and a line in `.env`; the command line wins.
 |---|---|---|---|
 | `--sparks N` | `SPARKS` | 4 | Sparks serving together. Only 4 is served so far. |
 | `--drafts N` | `DRAFTS` | 5 | Tokens the release's draft head proposes each step, 0 to 15. 0 turns the draft head off. |
-| `--prefill-rows N` | `PREFILL_ROWS` | 8192 | Rows a prefill pass runs together: 8192 or 16384. 16384 is quicker on long prompts and takes about 3 GB more a rank; with the draft head on it needs a Spark's memory to itself. |
+| `--prefill-rows N` | `PREFILL_ROWS` | 8192 | Rows a prefill pass runs together: 8192 or 16384. 16384 is quicker on long prompts and takes about 3 GB more a rank; with the draft head on it started on a Spark with 22 GB in other use, and did not on one with about 29 GB. |
 | `--context N` | `CONTEXT` | 131072 | The longest sequence, prompt and reply, in tokens; at most the model's 1,048,576. |
 | `--port N` | `PORT` | 8894 | The API's port on rank 0. Rank R also listens on this port + R, on its own loopback. |
 
