@@ -3,8 +3,8 @@
   "note": "Serves DeepSeek's release as published on four Sparks, four ranks joined in an RDMA ring: prefill, and decode with the release's draft head. Three Sparks are not served yet: the weight split is fixed at four parts. install/build.sh refuses any other tree, as SparkGLM's and SparkQwen's do.",
   "repository": "https://github.com/Enntity/atlas.git",
   "branch": "upstream/deepseek-v41-flash-20261114",
-  "commit": "bcef3befedc3fe4d815a9db5a948f9e4522becea",
-  "tree": "802f737be41472f84cee3c433e47d018aeef5570",
+  "commit": "fb3b99b68ec5b1c906fe85f61f9ed8865a0549bf",
+  "tree": "6df180798877450b035f13dabe258724e025dee6",
   "layers": {
     "atlas_inf_main_base": "d080d6b7db93bdc83acd737d2493fa53f3279371"
   },

@@ -20,12 +20,17 @@ First speeds, one stream, through `./start.sh` at its defaults
 on (46 tok/s with it off). With `--prefill-rows 16384 --drafts 0` the same
 prefill takes 4.72 to 5.36 s.
 
-That receipt was recorded one engine pin back (`8c71b62e`). The engine pinned
-now runs a batch's attention faster and changes nothing else: on the same
-four Sparks the 16,384-row prefill took 4.35 s (7,350 tok/s) on the engine's
-own test harness, with the same tokens after a 32,000-token and a 9,000-token
-prompt. It has not been started through `./start.sh` yet, so there is no
-receipt for it here.
+That receipt was recorded two engine pins back (`8c71b62e`). The pins since
+change no tokens. The first (`bcef3bef`) runs a batch's attention faster: on
+the same four Sparks the 16,384-row prefill took 4.35 s (7,350 tok/s) on the
+engine's own test harness, with the same tokens after a 32,000-token and a
+9,000-token prompt. The engine pinned now (`fb3b99b6`) picks a greedy step's
+token without reading the whole head and makes a drafted step cheaper:
+started by hand on the same four Sparks at 2,048 prefill rows, it replied at
+58 tok/s on prose, 104.5 on Python and 98 on JSON with the draft head on and
+50.4 to 50.8 with it off, with the same replies as the engine before it.
+Neither pin has been started through `./start.sh` yet, so there is no receipt
+for them here.
 
 ```sh
 git clone https://github.com/Enntity/sparkseek.git
